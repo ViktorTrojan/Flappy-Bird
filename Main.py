@@ -20,8 +20,8 @@ def draw():
     game.draw(window)
     pygame.display.update()
 
-def enterDown(event):
-    game.enterDown(event)
+def returnDown(event):
+    game.returnDown(event)
 
 def spaceDown(event):
     game.spaceDown(event)
@@ -52,7 +52,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    enterDown(event)
+                    returnDown(event)
 
                 elif event.key == pygame.K_SPACE:
                     spaceDown(event)

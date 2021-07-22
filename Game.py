@@ -7,8 +7,7 @@ from Ground import Ground
 from Background import Background
 from Pipe import Pipes
 class Game:
-
-    scorePoints = 0
+    
     # game images
     img_base = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","base.png")).convert_alpha())
     img_pipe = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","pipe.png")).convert_alpha())
@@ -21,46 +20,53 @@ class Game:
     sfx_swooshing = pygame.mixer.Sound(os.path.join("sounds","sfx_swooshing.wav"))
     sfx_wing = pygame.mixer.Sound(os.path.join("sounds","sfx_wing.wav"))
 
-    def initGame(self):
-        velocity = 4
-        self.background = Background(0, 0.5, self.img_bg)
-        self.ground = Ground(self.HEIGHT - 70, velocity, self.img_base)
-        self.bird = Bird(self.WIDTH / 4, self.HEIGHT / 2, self.img_birdArr, self.sfx_wing)
-        self.pipes = Pipes(self.WIDTH, self.bird, self.img_pipe, self.sfx_hit)
+    scorePoints = 0
+    gameOver = False
+    gameOverCheck = False
 
     def __init__(self, WIDTH, HEIGHT):
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
         self.img_bg = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")).convert_alpha(), (WIDTH, HEIGHT))
-        self.gameOver = False
         # game objects
         self.initGame()
+
+    def initGame(self):
+        velocity = 4
+        self.background = Background(0, 0.5, self.img_bg)
+        self.ground = Ground(self.HEIGHT - 70, velocity, self.img_base)
+        self.bird = Bird(self.WIDTH / 4, self.HEIGHT / 2, self.img_birdArr, self.sfx_wing)
+        self.pipes = Pipes(self.WIDTH, self.img_pipe)
         
     def addPoint(self):
         self.scorePoints += 1
-        pygame.mixer.Sound.play(self.sfx_point)
+        pygame.mixer.Sound.play(self.sfx_point) # play pickup sound
 
-    def enterDown(self, event):
-        if self.pipes.gameOver:
-            self.scorePoints = 0
-            self.initGame()
+    def onCollide(self, ground):
+        if(self.gameOverCheck != self.gameOver):
+            self.gameOverCheck = self.gameOver
+            pygame.mixer.Sound.play(self.sfx_hit) # play hit sound
 
-    def spaceDown(self,event):
-        if not self.pipes.gameOver:
-            self.bird.jump()
-
-    def mouseDown(self,event):
-        if not self.pipes.gameOver:
-            self.bird.jump()
+            if not ground:
+                self.bird.vel = -8
 
     def update(self):
+        if self.ground.isColliding(self.bird):
+            self.gameOver = True
+            self.onCollide(True)
+
         self.bird.update()
-        if self.pipes.gameOver:
+        if self.gameOver:
             return
 
-        if self.bird.flying:
-            if self.pipes.update(): # if passed a pipe
+        if not self.bird.startScreen: # if not startscreen start showing pipes
+            if self.pipes.update(self.bird): # if passed a pipe
                 self.addPoint()
+            if self.pipes.isColliding(self.bird):
+                self.gameOver = True
+                self.onCollide(False)
+                return
+        
         self.background.move()
         self.ground.move()
         
@@ -71,11 +77,25 @@ class Game:
         self.ground.draw(window)
         self.bird.draw(window)
         drawText(window, str(self.scorePoints), self.WIDTH / 2, 40, 60, (255,255,255), 2)
-        if not self.bird.flying:
+        if self.bird.startScreen:
             drawText(window, "Tap to start playing!", self.WIDTH / 2, self.HEIGHT / 2.4, 40, (255,255,255), 2)
 
-        if self.pipes.gameOver:
+        if self.gameOver:
             drawText(window, "Press enter to restart!", self.WIDTH / 2, self.HEIGHT / 2.4, 35, (255,255,255), 2)
+
+    def returnDown(self, event):
+        if self.gameOver:
+            self.gameOverCheck = self.gameOver = False
+            self.scorePoints = 0
+            self.initGame()
+
+    def spaceDown(self,event):
+        if not self.gameOver:
+            self.bird.jump()
+
+    def mouseDown(self,event):
+        if not self.gameOver:
+            self.bird.jump()
 
 def drawCenteredText(window, text, x, y, size, color):
     customFont = pygame.font.Font("font.ttf", size)

@@ -27,7 +27,7 @@ class Bird:
         self.img_counter = 0
         self.boundingBox = (self.x+26, self.y+2, self.img.get_width()-34, self.img.get_height()-4)
         self.height = self.boundingBox[1]
-        self.flying = False
+        self.startScreen = True
 
     def fly(self):
         self.vel = max(self.vel + self.gravityConstant * self.gravity, self.limit)
@@ -47,7 +47,7 @@ class Bird:
         # set the bounding box
         self.boundingBox = (self.x+26, self.y+2, self.img.get_width()-34, self.img.get_height()-4)
 
-        if self.flying:
+        if not self.startScreen:
             self.fly()
 
         if self.tilt == -90:
@@ -66,10 +66,10 @@ class Bird:
             self.img_counter = 0
 
     def jump(self):
-        if not self.flying:
-            self.flying = True
+        if self.startScreen:
+            self.startScreen = False
         self.vel = self.flapping
-        self.height = self.boundingBox[1]
+        self.height = self.boundingBox[1] - self.boundingBox[3]
         pygame.mixer.Sound.play(self.sfx_wing)
 
     def draw(self, window):

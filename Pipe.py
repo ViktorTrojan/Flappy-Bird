@@ -4,25 +4,23 @@ import random
 # manages Pipes
 class Pipes:
 
-    def __init__(self, WIDTH, bird, img, sfx_hit):
+    def __init__(self, WIDTH, img):
         self.WIDTH = WIDTH
         self.img = img
         self.pipes = [Pipe(self.WIDTH, 550, 4, self.img)]
-        self.bird = bird
-        self.gameOver = False
-        self.sfx_hit = sfx_hit
 
-    def update(self):
+    def isColliding(self, bird):
+        for pipe in self.pipes:
+            if(pipe.isColliding(bird)):
+                return True
+        return False
+
+    def update(self, bird):
         add_pipe = False
         remove_pipes = []
         for pipe in self.pipes:
-            if self.gameOver:
-                return
-            if pipe.collide(self.bird):
-                self.gameOver = True
-                pygame.mixer.Sound.play(self.sfx_hit)
-                self.bird.vel = -8
-                return
+            #if pipe.isColliding(self.bird):
+            #    return
 
             pipe.move()
 
@@ -30,7 +28,7 @@ class Pipes:
                 remove_pipes.append(pipe)
                 continue
 
-            if not pipe.passed and pipe.x < self.bird.boundingBox[0]:
+            if not pipe.passed and pipe.x < bird.boundingBox[0]:
                 pipe.passed = True
                 add_pipe = True
                 continue
@@ -62,16 +60,15 @@ class Pipe:
         self.topPipe = pygame.transform.flip(img, False, True)
         self.summonPipe(length)
 
-    def collide(self, bird):
-        # bottom Pipe collision check
-        if bird.boundingBox[0] + bird.boundingBox[2] > self.x and bird.boundingBox[1] + bird.boundingBox[3] > self.bottom and bird.boundingBox[0] < self.x + self.bottomPipe.get_width():
-            return True
-
-        # top Pipe collision check
-        if bird.boundingBox[0] + bird.boundingBox[2] > self.x and bird.boundingBox[1] < self.top + self.topPipe.get_height() and bird.boundingBox[0] < self.x + self.topPipe.get_width():
-           return True
-
-        return False
+    def isColliding(self, bird):
+        # horizontal collision test works for top and bottom pipe
+        if bird.boundingBox[0] + bird.boundingBox[2] > self.x and bird.boundingBox[0] < self.x + self.bottomPipe.get_width():
+            # bottom Pipe collision check
+            if bird.boundingBox[1] + bird.boundingBox[3] > self.bottom:
+                return True
+            # top Pipe collision check
+            elif bird.boundingBox[1] < self.top + self.topPipe.get_height():
+                return True
 
     def summonPipe(self, length):
         self.height = random.randrange(0+self.margin, length - self.margin)

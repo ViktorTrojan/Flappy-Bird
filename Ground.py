@@ -1,6 +1,6 @@
 from Scrolling import Scrolling
-import pygame
-import os
 
 class Ground(Scrolling):
-    pass
+    def isColliding(self, bird):
+        if(bird.boundingBox[1] + bird.boundingBox[3] >= self.y):
+            return True
