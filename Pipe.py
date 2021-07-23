@@ -4,10 +4,11 @@ import random
 # manages Pipes
 class Pipes:
 
-    def __init__(self, WIDTH, img):
+    def __init__(self, WIDTH, HEIGHT, img):
         self.WIDTH = WIDTH
+        self.HEIGHT = HEIGHT
         self.img = img
-        self.pipes = [Pipe(self.WIDTH, 550, 4, self.img)]
+        self.pipes = [Pipe(self.WIDTH, self.HEIGHT, 4, self.img)]
 
     def isColliding(self, bird):
         for pipe in self.pipes:
@@ -37,7 +38,7 @@ class Pipes:
             self.pipes.remove(remove_pipe)
 
         if add_pipe:
-            self.pipes.append(Pipe(self.WIDTH, 550, 4, self.img))
+            self.pipes.append(Pipe(self.WIDTH, self.HEIGHT, 4, self.img))
             return True
 
     def draw(self, window):
@@ -71,7 +72,7 @@ class Pipe:
                 return True
 
     def summonPipe(self, length):
-        self.height = random.randrange(0+self.margin, length - self.margin)
+        self.height = random.randrange(0+self.margin, length - self.gap - self.margin)
         self.top = self.height - self.topPipe.get_height()
         self.bottom = self.height + self.gap
 

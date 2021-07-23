@@ -15,8 +15,8 @@ class Bird:
     limit = -10
     animation_time = 10
 
-    def __init__(self, x, y, imgs, sfx_wing):
-        
+    def __init__(self, x, y, imgs, sfx_wing, groundHeight):
+        self.groundHeight = groundHeight
         self.x = x
         self.y = y
         self.imgs = imgs
@@ -43,7 +43,7 @@ class Bird:
         self.tilt = min(25, max(-90, tiltPH))
 
     def update(self):
-        self.y = min(800-70-self.boundingBox[3], max(-15 - self.boundingBox[3], self.y + self.vel))  # set hight bounding limit
+        self.y = min(self.groundHeight-self.boundingBox[3], max(-15 - self.boundingBox[3], self.y + self.vel))  # set bounding limit
         # set the bounding box
         self.boundingBox = (self.x+26, self.y+2, self.img.get_width()-34, self.img.get_height()-4)
 

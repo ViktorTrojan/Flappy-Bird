@@ -1,5 +1,7 @@
 import pygame
 import os
+from threading import Thread
+import time
 
 # game imports
 from Bird import Bird
@@ -34,9 +36,9 @@ class Game:
     def initGame(self):
         velocity = 4
         self.background = Background(0, 0.5, self.img_bg)
-        self.ground = Ground(self.HEIGHT - 70, velocity, self.img_base)
-        self.bird = Bird(self.WIDTH / 4, self.HEIGHT / 2, self.img_birdArr, self.sfx_wing)
-        self.pipes = Pipes(self.WIDTH, self.img_pipe)
+        self.ground = Ground(self.HEIGHT - 60, velocity, self.img_base)
+        self.bird = Bird(self.WIDTH / 4, self.HEIGHT / 2, self.img_birdArr, self.sfx_wing, self.ground.y)
+        self.pipes = Pipes(self.WIDTH, self.ground.y, self.img_pipe)
         
     def addPoint(self):
         self.scorePoints += 1
@@ -49,6 +51,8 @@ class Game:
 
             if not ground:
                 self.bird.vel = -8
+                time.sleep(0.3)
+                pygame.mixer.Sound.play(self.sfx_die) # play die sound
 
     def update(self):
         if self.ground.isColliding(self.bird):
@@ -64,7 +68,8 @@ class Game:
                 self.addPoint()
             if self.pipes.isColliding(self.bird):
                 self.gameOver = True
-                self.onCollide(False)
+                t = Thread(target=self.onCollide, args=(False,))
+                t.start()
                 return
         
         self.background.move()
