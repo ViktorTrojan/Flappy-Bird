@@ -2,6 +2,7 @@ import pygame
 import os
 from threading import Thread
 import time
+import random
 
 # game imports
 from Bird import Bird
@@ -25,6 +26,7 @@ class Game:
     scorePoints = 0
     gameOver = False
     gameOverCheck = False
+    flashCounter = 200
 
     def __init__(self, WIDTH, HEIGHT):
         self.WIDTH = WIDTH
@@ -43,6 +45,20 @@ class Game:
     def addPoint(self):
         self.scorePoints += 1
         pygame.mixer.Sound.play(self.sfx_point) # play pickup sound
+
+    def flashBank(self, window):
+        if self.flashCounter == 0:
+            return
+        self.flashCounter = max(self.flashCounter - 8, 0)
+        s = pygame.Surface((self.WIDTH,self.HEIGHT), pygame.SRCALPHA)   # per-pixel alpha
+        s.fill((255,255,255,self.flashCounter))
+        window.blit(s, (0,0))
+
+    def shakeScreen(self, window, temp_window):
+        if self.flashCounter < 150:
+            return
+        window.blit(temp_window,(random.randint(-5, 5),random.randint(-5, 5)))
+
 
     def onCollide(self, ground):
         if(self.gameOverCheck != self.gameOver):
@@ -77,21 +93,25 @@ class Game:
         
 
     def draw(self, window):
-        self.background.draw(window)
-        self.pipes.draw(window)
-        self.ground.draw(window)
-        self.bird.draw(window)
-        drawText(window, str(self.scorePoints), self.WIDTH / 2, 40, 60, (255,255,255), 2)
+        temp_window = window
+        self.background.draw(temp_window)
+        self.pipes.draw(temp_window)
+        self.ground.draw(temp_window)
+        self.bird.draw(temp_window)
+        drawText(temp_window, str(self.scorePoints), self.WIDTH / 2, 40, 60, (255,255,255), 2)
         if self.bird.startScreen:
-            drawText(window, "Tap to start playing!", self.WIDTH / 2, self.HEIGHT / 2.4, 40, (255,255,255), 2)
+            drawText(temp_window, "Tap to start playing!", self.WIDTH / 2, self.HEIGHT / 2.4, 40, (255,255,255), 2)
 
         if self.gameOver:
-            drawText(window, "Press enter to restart!", self.WIDTH / 2, self.HEIGHT / 2.4, 35, (255,255,255), 2)
+            drawText(temp_window, "Press return to restart!", self.WIDTH / 2, self.HEIGHT / 2.4, 35, (255,255,255), 2)
+            self.shakeScreen(window, temp_window)
+            self.flashBank(temp_window)
 
     def returnDown(self, event):
         if self.gameOver:
             self.gameOverCheck = self.gameOver = False
             self.scorePoints = 0
+            self.flashCounter = 250
             self.initGame()
 
     def spaceDown(self,event):
