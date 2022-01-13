@@ -9,6 +9,7 @@ https://user-images.githubusercontent.com/87524553/149379309-efb447b7-e514-457c-
 ## Features
 * Smooth 60FPS
 * Respawn Logic
+* Sound System
 * Animation on Death
 * Smaller forgiving collision-box
 * Bird, Background, Ground Animation
