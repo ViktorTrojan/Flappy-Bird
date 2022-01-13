@@ -12,7 +12,13 @@ from Pipe import Pipes
 class Game:
     
     # game images
-    img_base = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","base.png")).convert_alpha())
+    row = pygame.image.load(os.path.join("imgs","base.png")).convert_alpha()
+    x, y = row.get_size()
+    rx = 1000 / x
+    ry = 600 / y
+
+    #img_base = pygame.transform.scale(row, (100,100))
+    img_base = pygame.transform.scale2x(row)
     img_pipe = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","pipe.png")).convert_alpha())
     img_birdArr = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird" + str(x) + ".png"))) for x in range(1,4)]
 
@@ -31,7 +37,7 @@ class Game:
     def __init__(self, WIDTH, HEIGHT):
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
-        self.img_bg = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")).convert_alpha(), (WIDTH, HEIGHT))
+        self.img_bg = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")).convert_alpha(), (self.WIDTH, self.HEIGHT))
         # game objects
         self.initGame()
 

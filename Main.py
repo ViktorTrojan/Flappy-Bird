@@ -6,8 +6,10 @@ pygame.font.init()
 pygame.mixer.init()
 pygame.display.set_caption('Flappy-Bird') # set app title
 
-WIDTH = 500
-HEIGHT = 800
+infoObject = pygame.display.Info() # get screen size
+HEIGHT = int(infoObject.current_h - infoObject.current_h / 10)
+WIDTH =  int(HEIGHT - HEIGHT / 3)
+
 window = pygame.display.set_mode((WIDTH, HEIGHT)) # set window size
 
 from Game import Game
@@ -33,7 +35,7 @@ ns = 1000000000 / 60; # 60 fps the second
 delta = 0
 lastTime = time.time_ns()
 
-# used for constant updates(e.g. 60p.s.) and many fps
+# used for constant updates(e.g. 60p.s.) and unlimited drawing
 def fpsLoop():
     global delta
     global lastTime
